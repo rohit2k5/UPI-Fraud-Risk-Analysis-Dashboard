@@ -639,7 +639,7 @@ If required, update the data source path to the processed CSV file.
 Aspiring Data Analyst | MySQL | Python | Power BI | SQL
 
 - LinkedIn: "https://www.linkedin.com/in/rohitmirge/"
-- portfolio: ""
+- portfolio: "https://personal-portfolio-dun-five-47.vercel.app/"
 
 ---
 
