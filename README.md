@@ -18,15 +18,494 @@ The project does **not** use complex machine learning. Instead, it uses transpar
 
 ## Business Objective
 
-The main objective is to help a fraud or operations team answer the following questions:
+## Business Questions and Analysis
 
-- What is the overall fraud rate and fraud amount?
-- Which cities, transaction types, devices, payment methods, and merchant categories have higher fraud rates?
-- At which transaction hours or days does fraud occur more frequently?
-- Do new devices, new beneficiaries, and repeated failed attempts show higher fraud risk?
-- How many actual fraud transactions were captured by the rule-based alert process?
-- How many legitimate transactions were unnecessarily flagged?
-- Which transactions and senders should be prioritized for investigation?
+This project answers key fraud-risk and transaction-monitoring questions using actual fraud labels (`fraud_flag`), rule-based alerts (`predicted_fraud_flag`), and risk categories (`risk_band`).
+
+### 1. What is the overall fraud rate and fraud amount?
+
+The dataset contains **30,000 transactions**, including **385 actual fraud-labelled transactions**.
+
+- **Overall Fraud Rate:** **1.28%**
+- **Actual Fraud Amount:** **₹953.60K**
+- **Average Fraud Amount:** **₹2.48K**
+- **High-Risk Transactions:** **294**
+
+> Fraud rate is calculated as actual fraud transactions divided by total transactions. Fraud amount is the sum of transaction amounts where `fraud_flag = 1`.
+
+```sql
+SELECT
+    COUNT(*) AS total_transactions,
+
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN fraud_flag = 1 THEN transaction_amount
+                ELSE 0
+            END
+        ),
+        2
+    ) AS fraud_amount
+
+FROM upi_transactions;
+```
+
+---
+
+### 2. Which cities, transaction types, devices, payment methods, and merchant categories have higher fraud rates?
+
+The analysis compares fraud rate, fraud count, and fraud amount across important transaction segments:
+
+- **Cities:** Identify geographic areas with higher fraud rate or financial fraud impact.
+- **Transaction Types:** Compare P2P, P2M, bill payments, and mobile recharge transactions.
+- **Device Types:** Compare Android, iOS, Web, and Unknown device categories.
+- **Payment Methods:** Compare QR Code, UPI ID, mobile number, and collect-request transactions.
+- **Merchant Categories:** Identify categories with higher fraud rate or fraud amount.
+
+> A high fraud rate alone does not always indicate the highest business priority. Transaction volume and fraud amount must also be considered.
+
+#### City-level fraud analysis
+
+```sql
+SELECT
+    city,
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN fraud_flag = 1 THEN transaction_amount
+                ELSE 0
+            END
+        ),
+        2
+    ) AS fraud_amount
+
+FROM upi_transactions
+GROUP BY city
+HAVING COUNT(*) >= 20
+ORDER BY fraud_rate_pct DESC;
+```
+
+#### Transaction-type fraud analysis
+
+```sql
+SELECT
+    transaction_type,
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN fraud_flag = 1 THEN transaction_amount
+                ELSE 0
+            END
+        ),
+        2
+    ) AS fraud_amount
+
+FROM upi_transactions
+GROUP BY transaction_type
+ORDER BY fraud_rate_pct DESC;
+```
+
+#### Device-type fraud analysis
+
+```sql
+SELECT
+    COALESCE(device_type, 'Unknown') AS device_type,
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN fraud_flag = 1 THEN transaction_amount
+                ELSE 0
+            END
+        ),
+        2
+    ) AS fraud_amount
+
+FROM upi_transactions
+GROUP BY COALESCE(device_type, 'Unknown')
+ORDER BY fraud_rate_pct DESC;
+```
+
+#### Payment-method fraud analysis
+
+```sql
+SELECT
+    payment_method,
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN fraud_flag = 1 THEN transaction_amount
+                ELSE 0
+            END
+        ),
+        2
+    ) AS fraud_amount
+
+FROM upi_transactions
+GROUP BY payment_method
+ORDER BY fraud_rate_pct DESC;
+```
+
+#### Merchant-category fraud analysis
+
+```sql
+SELECT
+    merchant_category,
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN fraud_flag = 1 THEN transaction_amount
+                ELSE 0
+            END
+        ),
+        2
+    ) AS fraud_amount
+
+FROM upi_transactions
+GROUP BY merchant_category
+HAVING COUNT(*) >= 20
+ORDER BY fraud_rate_pct DESC;
+```
+
+---
+
+### 3. At which transaction hours or days does fraud occur more frequently?
+
+Fraud patterns were analyzed by transaction hour and day of week to identify time periods requiring more monitoring.
+
+#### Fraud rate by transaction hour
+
+```sql
+SELECT
+    transaction_hour,
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct
+
+FROM upi_transactions
+GROUP BY transaction_hour
+ORDER BY fraud_rate_pct DESC;
+```
+
+#### Fraud rate by day of week
+
+```sql
+SELECT
+    transaction_day,
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct
+
+FROM upi_transactions
+GROUP BY transaction_day
+ORDER BY fraud_rate_pct DESC;
+```
+
+> In Power BI, this analysis is displayed through a matrix heatmap with `transaction_day` on rows, `transaction_hour` on columns, and `Actual Fraud Rate %` as the value.
+
+---
+
+### 4. Do new devices, new beneficiaries, and repeated failed attempts show higher fraud risk?
+
+This analysis evaluates whether behavior-based risk indicators have higher actual fraud rates.
+
+#### New device versus known device
+
+```sql
+SELECT
+    CASE
+        WHEN is_new_device = 1 THEN 'New Device'
+        ELSE 'Known Device'
+    END AS device_status,
+
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct
+
+FROM upi_transactions
+GROUP BY is_new_device
+ORDER BY fraud_rate_pct DESC;
+```
+
+#### New beneficiary versus known beneficiary
+
+```sql
+SELECT
+    CASE
+        WHEN is_new_beneficiary = 1 THEN 'New Beneficiary'
+        ELSE 'Known Beneficiary'
+    END AS beneficiary_status,
+
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct
+
+FROM upi_transactions
+GROUP BY is_new_beneficiary
+ORDER BY fraud_rate_pct DESC;
+```
+
+#### Failed-attempt analysis
+
+```sql
+SELECT
+    CASE
+        WHEN failed_attempts_24h = 0 THEN 'No Failed Attempts'
+        WHEN failed_attempts_24h BETWEEN 1 AND 2 THEN '1 to 2 Failed Attempts'
+        ELSE '3 or More Failed Attempts'
+    END AS failed_attempt_group,
+
+    COUNT(*) AS total_transactions,
+    SUM(fraud_flag) AS fraud_transactions,
+
+    ROUND(
+        SUM(fraud_flag) * 100.0 / COUNT(*),
+        2
+    ) AS fraud_rate_pct
+
+FROM upi_transactions
+GROUP BY failed_attempt_group
+ORDER BY fraud_rate_pct DESC;
+```
+
+> These indicators should be treated as risk signals, not proof of fraud. They are more useful when combined with other conditions such as high transaction amount, unusual transaction hour, and a High risk band.
+
+---
+
+### 5. How many actual fraud transactions were captured by the rule-based alert process?
+
+The project compares:
+
+- `fraud_flag = 1`: Actual fraud-labelled transaction.
+- `predicted_fraud_flag = 1`: Rule-based suspicious transaction alert.
+
+```sql
+SELECT
+    SUM(
+        CASE
+            WHEN fraud_flag = 1
+             AND predicted_fraud_flag = 1
+            THEN 1
+            ELSE 0
+        END
+    ) AS actual_fraud_captured,
+
+    SUM(
+        CASE
+            WHEN fraud_flag = 1
+             AND predicted_fraud_flag = 0
+            THEN 1
+            ELSE 0
+        END
+    ) AS actual_fraud_not_captured,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN fraud_flag = 1
+                 AND predicted_fraud_flag = 1
+                THEN 1
+                ELSE 0
+            END
+        ) * 100.0
+        / NULLIF(SUM(fraud_flag), 0),
+        2
+    ) AS rule_capture_rate_pct
+
+FROM upi_transactions;
+```
+
+> **Rule Capture Rate** shows the percentage of actual fraud-labelled transactions captured by the rule-based alert logic. It is not a machine-learning model metric.
+
+---
+
+### 6. How many legitimate transactions were unnecessarily flagged?
+
+A transaction is considered **Legitimate but Flagged** when:
+
+```text
+fraud_flag = 0
+predicted_fraud_flag = 1
+```
+
+```sql
+SELECT
+    COUNT(*) AS legitimate_but_flagged_transactions,
+
+    ROUND(
+        SUM(transaction_amount),
+        2
+    ) AS legitimate_flagged_transaction_value
+
+FROM upi_transactions
+WHERE fraud_flag = 0
+  AND predicted_fraud_flag = 1;
+```
+
+> This metric is important because too many legitimate alerts can increase manual-review workload and create inconvenience for genuine customers.
+
+---
+
+### 7. Which transactions and senders should be prioritized for investigation?
+
+High-priority transactions include records with one or more of the following conditions:
+
+- `risk_band = 'High'`
+- `predicted_fraud_flag = 1`
+- High transaction amount
+- New device activity
+- New beneficiary activity
+- Three or more failed attempts in 24 hours
+- Night-time transaction
+- Actual fraud label, where available
+
+#### High-priority transaction investigation query
+
+```sql
+SELECT
+    transaction_id,
+    transaction_datetime,
+    sender_id,
+    receiver_id,
+    transaction_amount,
+    transaction_type,
+    merchant_category,
+    city,
+    device_type,
+    payment_method,
+    failed_attempts_24h,
+    is_new_device,
+    is_new_beneficiary,
+    risk_band,
+    predicted_fraud_flag,
+    fraud_flag
+
+FROM upi_transactions
+WHERE risk_band IN ('High', 'High Risk')
+   OR predicted_fraud_flag = 1
+
+ORDER BY
+    fraud_flag DESC,
+    transaction_amount DESC,
+    failed_attempts_24h DESC;
+```
+
+#### Top risky senders query
+
+```sql
+SELECT
+    sender_id,
+
+    COUNT(*) AS total_transactions,
+
+    ROUND(
+        SUM(transaction_amount),
+        2
+    ) AS total_transaction_value,
+
+    SUM(fraud_flag) AS actual_fraud_transactions,
+
+    SUM(predicted_fraud_flag) AS rule_based_flagged_transactions,
+
+    SUM(
+        CASE
+            WHEN risk_band IN ('High', 'High Risk')
+            THEN 1
+            ELSE 0
+        END
+    ) AS high_risk_transactions
+
+FROM upi_transactions
+GROUP BY sender_id
+ORDER BY
+    actual_fraud_transactions DESC,
+    high_risk_transactions DESC,
+    total_transaction_value DESC
+
+LIMIT 10;
+```
+
+> Investigation priority should consider actual fraud labels, High risk band, rule-based alerts, high transaction value, repeated failed attempts, new-device activity, and new-beneficiary activity. A single signal alone should not be treated as proof of fraud.
+
+---
+
+## Business Recommendations
+
+- Apply additional verification to high-value transactions that fall into the High risk band.
+- Prioritize transactions combining new device, new beneficiary, high amount, night-time activity, and repeated failed attempts.
+- Send rule-flagged transactions to a manual-review or additional-verification queue instead of automatically blocking every transaction.
+- Monitor fraud rate and fraud amount by city, transaction type, merchant category, device type, and payment method.
+- Review the rule logic if a large number of legitimate transactions are flagged.
+- Monitor rule capture rate and legitimate-but-flagged volume regularly.
+- Use actual fraud rate and fraud amount together when prioritizing fraud-operations resources.
+
+---
+
+## Important Limitation
+
+This project uses synthetic UPI-style data for educational and portfolio purposes. The `fraud_flag` is a dataset label and should not be interpreted as confirmed real-world fraud. The rule-based risk bands support transaction monitoring and investigation prioritization; they do not automatically prove fraud or replace a production fraud-control system.
 
 ---
 
