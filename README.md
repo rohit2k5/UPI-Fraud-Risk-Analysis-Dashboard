@@ -35,7 +35,12 @@ The main objective is to help a fraud or operations team answer the following qu
 <p align="center">
   <img src="https://github.com/rohit2k5/UPI-Fraud-Risk-Analysis-Dashboard/blob/main/Img/Executive_Overview.png?raw=true" alt="Power BI Dashboard" width="900">
 </p>
-
+<p align="center">
+  <img src="https://github.com/rohit2k5/UPI-Fraud-Risk-Analysis-Dashboard/blob/main/Img/Fraud_Pattern_Analysis.png?raw=true" alt="Power BI Dashboard" width="900">
+</p>
+<p align="center">
+  <img src="https://github.com/rohit2k5/UPI-Fraud-Risk-Analysis-Dashboard/blob/main/Img/Risk_Investingation.png?raw=true" alt="Power BI Dashboard" width="900">
+</p>
 ---
 
 ## Project Workflow
