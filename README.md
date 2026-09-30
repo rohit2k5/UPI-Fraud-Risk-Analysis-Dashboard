@@ -33,7 +33,7 @@ The main objective is to help a fraud or operations team answer the following qu
 ## Dashboard Preview
 
 <p align="center">
-  <img src="images/Executive_Overview.png" alt="Power BI Dashboard" width="900">
+  <img src="https://github.com/rohit2k5/UPI-Fraud-Risk-Analysis-Dashboard/blob/main/Img/Executive_Overview.png?raw=true" alt="Power BI Dashboard" width="900">
 </p>
 
 ---
