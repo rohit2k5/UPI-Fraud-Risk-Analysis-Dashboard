@@ -32,15 +32,9 @@ The main objective is to help a fraud or operations team answer the following qu
 
 ## Dashboard Preview
 
-Add your Power BI dashboard screenshots inside the `images/` folder, then uncomment and update these lines.
-
-```markdown
-
-
-
-
-
-```
+<p align="center">
+  <img src="images/Executive_Overview.png" alt="Power BI Dashboard" width="900">
+</p>
 
 ---
 
