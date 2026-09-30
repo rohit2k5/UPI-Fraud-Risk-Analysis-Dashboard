@@ -31,15 +31,17 @@ The main objective is to help a fraud or operations team answer the following qu
 ---
 
 ## Dashboard Preview
-
+<h1>Executive Overview</h1>
 <p align="center">
   <img src="https://github.com/rohit2k5/UPI-Fraud-Risk-Analysis-Dashboard/blob/main/Img/Executive_Overview.png?raw=true" alt="Power BI Dashboard" width="900">
 </p>
+<h1>Fraud Pattern Analysis</h1>
 <p align="center">
   <img src="https://github.com/rohit2k5/UPI-Fraud-Risk-Analysis-Dashboard/blob/main/Img/Fraud_Pattern_Analysis.png?raw=true" alt="Power BI Dashboard" width="900">
 </p>
+<h1>Risk Investigation</h1>
 <p align="center">
-  <img src="https://github.com/rohit2k5/UPI-Fraud-Risk-Analysis-Dashboard/blob/main/Img/Risk_Investingation.png?raw=true" alt="Power BI Dashboard" width="900">
+  <img src="https://github.com/rohit2k5/UPI-Fraud-Risk-Analysis-Dashboard/blob/main/Img/Risk_Investigation.png?raw=true" alt="Power BI Dashboard" width="900">
 </p>
 ---
 
