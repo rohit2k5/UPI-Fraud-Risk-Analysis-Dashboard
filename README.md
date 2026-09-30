@@ -634,12 +634,12 @@ If required, update the data source path to the processed CSV file.
 
 ## Author
 
-**Rohit Mirge**
+**Rohit Mirage**
 
 Aspiring Data Analyst | MySQL | Python | Power BI | SQL
 
-- LinkedIn: Add your LinkedIn profile link here
-- GitHub: Add your GitHub profile link here
+- LinkedIn: ""
+- portfolio: ""
 
 ---
 
