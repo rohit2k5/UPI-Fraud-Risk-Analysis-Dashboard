@@ -638,7 +638,7 @@ If required, update the data source path to the processed CSV file.
 
 Aspiring Data Analyst | MySQL | Python | Power BI | SQL
 
-- LinkedIn: ""
+- LinkedIn: "https://www.linkedin.com/in/rohitmirge/"
 - portfolio: ""
 
 ---
