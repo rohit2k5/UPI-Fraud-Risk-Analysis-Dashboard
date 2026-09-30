@@ -1,0 +1,21 @@
+column_name,data_type,description,example
+transaction_id,Text,Unique transaction ID; primary key in the clean file,UPI20260000001
+transaction_datetime,DateTime,Date and time of the transaction,2026-03-15 21:20:00
+sender_id,Text,Masked synthetic sender/customer identifier,CUST_01234
+receiver_id,Text,Masked synthetic receiver or merchant identifier,RECV_00012
+transaction_amount,Decimal,Transaction amount in Indian rupees (INR),1850.00
+transaction_type,Text,"P2P, P2M, Bill Payment, or Mobile Recharge",P2M
+merchant_category,Text,Merchant or payment category,Grocery
+city,Text,Synthetic transaction city,Pune
+state,Text,State corresponding to city,Maharashtra
+device_type,Text,Device platform used,Android
+device_id,Text,Masked synthetic device ID,DEV_001234
+network_type,Text,Network used for transaction,5G
+payment_method,Text,UPI initiation method,QR Code
+transaction_status,Text,"Success, Failed, or Pending",Success
+previous_transaction_count,Integer,Earlier transaction count for sender,18
+customer_age_days,Integer,Synthetic account age in days,142
+failed_attempts_24h,Integer,Failed attempts in prior 24 hours,2
+is_new_device,Integer,1=new device; 0=known device,1
+is_new_beneficiary,Integer,1=new receiver/beneficiary; 0=known,0
+fraud_flag,Integer,"Synthetic target label: 1=fraud, 0=legitimate",0

@@ -1,0 +1,7 @@
+metric,value
+Clean rows,30000.0
+Raw rows,30020.0
+Fraud transactions (clean),385.0
+Fraud rate % (clean),1.28
+Duplicate rows intentionally added to raw,20.0
+Missing category/device/network values in raw,90.0
